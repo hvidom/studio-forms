@@ -11,3 +11,14 @@ export const users = sqliteTable('users', {
   city: text('city'), // Optional by default if .notNull() is omitted
   zipcode: text('zipcode'), // Optional
 });
+
+export const contacts = sqliteTable('contacts', {
+  id:        integer('id').primaryKey({ autoIncrement: true }),
+  name:      text('name').notNull(),
+  email:     text('email').notNull(),
+  message:   text('message').notNull(),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
+});
+
+export type InsertContact = typeof contacts.$inferInsert;
+export type SelectContact = typeof contacts.$inferSelect;

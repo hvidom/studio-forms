@@ -1,226 +1,106 @@
-"use client"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, useForm } from "react-hook-form"
-import { toast } from "sonner"
-import * as z from "zod"
+// src/components/react/contact-form.tsx
+'use client';
 
-import { userPayloadSchema } from "@/lib/userPayloadSchema"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { contactSchema } from '@/lib/api';
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
-export function UserForm() {
-  const form = useForm<z.infer<typeof userPayloadSchema>>({
-    resolver: zodResolver(userPayloadSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      dateOfBirth: "",
-      city: "",
-      zipcode: "",
-    },
-  })
+type FormValues = z.infer<typeof contactSchema>;
 
-  async function onSubmit(values: z.infer<typeof userPayloadSchema>) {
+export function ContactForm() {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: '', email: '', message: '' },
+  });
+
+  async function onSubmit(values: FormValues) {
     try {
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
-      })
+      });
 
-      const result = (await response.json()) as {
-        success?: boolean
-        error?: string
+      const json = await res.json<{ success: boolean; error?: string }>();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error ?? 'Something went wrong');
       }
 
-      if (result.success) {
-        toast.success("User registered successfully!")
-        form.reset()
-      } else {
-        toast.error(`Error: ${result.error}`)
-      }
-    } catch (error) {
-      toast.error("Submission failed. Check your local server connection.")
-      console.error(error)
+      toast.success('Message sent!', {
+        description: "We'll get back to you soon.",
+      });
+      reset();
+    } catch (err) {
+      toast.error('Failed to send', {
+        description: err instanceof Error ? err.message : 'Please try again.',
+      });
     }
   }
 
   return (
-    <Card className="w-full sm:max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Register User</CardTitle>
-        <CardDescription>
-          Provide account credentials and physical address details below.
-        </CardDescription>
-      </CardHeader>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="space-y-1.5">
+        <label htmlFor="name" className="text-sm font-medium">
+          Name
+        </label>
+        <Input
+          id="name"
+          placeholder="Your name"
+          aria-invalid={!!errors.name}
+          {...register('name')}
+        />
+        {errors.name && (
+          <p className="text-sm text-destructive">{errors.name.message}</p>
+        )}
+      </div>
 
-      <CardContent>
-        <form id="user-registration-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            {/* First Name & Last Name Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="firstName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="user-first-name">First Name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="user-first-name"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="John"
-                      autoComplete="given-name"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="lastName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="user-last-name">Last Name</FieldLabel>
-                    <Input
-                      {...field}
-                      id="user-last-name"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Doe"
-                      autoComplete="family-name"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </div>
+      <div className="space-y-1.5">
+        <label htmlFor="email" className="text-sm font-medium">
+          Email
+        </label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          aria-invalid={!!errors.email}
+          {...register('email')}
+        />
+        {errors.email && (
+          <p className="text-sm text-destructive">{errors.email.message}</p>
+        )}
+      </div>
 
-            {/* Email Field */}
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="user-email">Email</FieldLabel>
-                  <Input
-                    {...field}
-                    id="user-email"
-                    type="email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="john.doe@example.com"
-                    autoComplete="email"
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+      <div className="space-y-1.5">
+        <label htmlFor="message" className="text-sm font-medium">
+          Message
+        </label>
+        <Textarea
+          id="message"
+          placeholder="Tell us how we can help..."
+          className="min-h-[120px]"
+          aria-invalid={!!errors.message}
+          {...register('message')}
+        />
+        {errors.message && (
+          <p className="text-sm text-destructive">{errors.message.message}</p>
+        )}
+      </div>
 
-            {/* Phone Number Field */}
-            <Controller
-              name="phoneNumber"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="user-phone">Phone Number</FieldLabel>
-                  <Input
-                    {...field}
-                    id="user-phone"
-                    type="tel"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="123-456-7890"
-                    autoComplete="tel"
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            {/* Date of Birth Field */}
-            <Controller
-              name="dateOfBirth"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="user-dob">Date of Birth</FieldLabel>
-                  <Input
-                    {...field}
-                    id="user-dob"
-                    type="date"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            {/* City & Zipcode Grid (Optional Fields) */}
-            <div className="grid grid-cols-2 gap-4">
-              <Controller
-                name="city"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="user-city">City (Optional)</FieldLabel>
-                    <Input
-                      {...field}
-                      id="user-city"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="New York"
-                      autoComplete="address-level2"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="zipcode"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="user-zipcode">Zipcode (Optional)</FieldLabel>
-                    <Input
-                      {...field}
-                      id="user-zipcode"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="10001"
-                      autoComplete="postal-code"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            </div>
-          </FieldGroup>
-        </form>
-      </CardContent>
-
-      <CardFooter>
-        <Field orientation="horizontal" className="w-full justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          <Button type="submit" form="user-registration-form">
-            Submit
-          </Button>
-        </Field>
-      </CardFooter>
-    </Card>
-  )
+      <Button type="submit" disabled={isSubmitting} className="w-full">
+        {isSubmitting ? 'Sending...' : 'Send message'}
+      </Button>
+    </form>
+  );
 }
