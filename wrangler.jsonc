@@ -1,7 +1,8 @@
 {
 	"compatibility_date": "2026-05-12",
 	"compatibility_flags": [
-		"global_fetch_strictly_public"
+		"global_fetch_strictly_public",
+    "nodejs_compat"
 	],
 	"name": "studio-forms",
 	"main": "@astrojs/cloudflare/entrypoints/server",
@@ -16,7 +17,8 @@
 		{
 			"binding": "d1_prod",
 			"database_name": "d1-prod",
-			"database_id": "3b9f69f3-d39d-4ca9-84fa-33f8540c6dcc"
+			"database_id": "3b9f69f3-d39d-4ca9-84fa-33f8540c6dcc",
+       "migrations_dir": "drizzle"
 		}
 	]
 }
