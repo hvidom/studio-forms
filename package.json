@@ -26,6 +26,7 @@
   "type": "module",
   "scripts": {
     "browserslist": "bunx update-browserslist-db@latest",
+    "start": "bun run cf-typegen && bun run astro check && astro dev",
     "dev": "astro dev",
     "build": "astro check && astro build && bun run build:tailwind && bun run build:postcss",
     "sync": "astro sync",
