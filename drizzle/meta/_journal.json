@@ -8,6 +8,13 @@
       "when": 1778664754527,
       "tag": "0000_fluffy_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1778668573895,
+      "tag": "0001_romantic_bishop",
+      "breakpoints": true
     }
   ]
 }
