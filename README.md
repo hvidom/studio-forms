@@ -1,6 +1,4 @@
-import os
-
-markdown_content = """# Project Script Reference
+# Project Script Reference
 
 This repository utilizes a high-performance modern web stack powered by **Astro**, **Bun**, **Tailwind CSS v4**, **Drizzle ORM**, and **Cloudflare Wrangler**.
 
@@ -80,7 +78,3 @@ Below is a detailed guide to the scripts available in the `package.json` file.
 
 * **`bun run browserslist`** (`bunx update-browserslist-db@latest`)  
   Updates your local `caniuse-lite` target database, ensuring CSS autoprefixing and bundling configurations target accurate vendor browser versions.
-"""
-
-with open("README.md", "w", encoding="utf-8") as f:
-    f.write(markdown_content)
