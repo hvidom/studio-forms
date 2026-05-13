@@ -27,10 +27,16 @@ api.post(
     const db = getDb(c.env.d1_prod);
 
     try {
-      const [result] = await db
+      const results = await db
         .insert(contacts)
         .values(data)
         .returning({ id: contacts.id });
+
+      const result = results[0];
+
+      if (!result) {
+        return c.json({ success: false, error: 'Insert returned no data' }, 500);
+      }
 
       return c.json({ success: true, id: result.id }, 201);
     } catch (err) {
