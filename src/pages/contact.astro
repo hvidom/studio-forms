@@ -1,14 +1,91 @@
 ---
-// src/pages/contact.astro
-import Layout from '@/layouts/Layout.astro';
-import { ContactForm } from '@/components/react/userForm';
+import "@/styles/contact.css"
+export const prerender = false;
+import ContactForm from '@/components/react/ContactForm';
 import { Toaster } from 'sonner';
 ---
 
-<Layout title="Contact">
-  <Toaster richColors position="top-right" client:load />
-  <main class="max-w-lg mx-auto py-16 px-4">
-    <h1 class="text-2xl font-medium mb-8">Get in touch</h1>
-    <ContactForm client:load />
-  </main>
-</Layout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Get in touch</title>
+    <link rel="stylesheet" href="/global.css" />
+  </head>
+  <body>
+    <main>
+      <div class="page-wrapper">
+        <header class="page-header">
+          <div class="eyebrow">Contact</div>
+          <h1>Get in touch</h1>
+          <p class="subtitle">
+            We read every message. Expect a reply within one business day.
+          </p>
+        </header>
+
+        <div class="form-card">
+          <!-- client:load so React hydrates immediately on page load -->
+          <ContactForm client:load />
+        </div>
+      </div>
+    </main>
+
+    <!-- Sonner toast container – must live outside the React island -->
+    <Toaster client:load richColors position="bottom-right" />
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem;
+  }
+
+  .page-wrapper {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    color: var(--color-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    padding: 2rem;
+  }
+</style>

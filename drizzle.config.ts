@@ -1,16 +1,14 @@
-import 'dotenv/config';
+// drizzle.config.ts
 import { defineConfig } from 'drizzle-kit';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './drizzle',
-  dialect: 'sqlite',
-  strict: true,
-  verbose: true,
-  ...(isProd
+export default defineConfig(
+  isProd
     ? {
+        schema: './src/db/schema.ts',
+        out: './drizzle',
+        dialect: 'sqlite',
         driver: 'd1-http',
         dbCredentials: {
           accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
@@ -19,11 +17,14 @@ export default defineConfig({
         },
       }
     : {
+        schema: './src/db/schema.ts',
+        out: './drizzle',
+        dialect: 'sqlite',
         dbCredentials: {
-          url: 'file:./src/db/local.db', // matches repo convention
+          url: process.env.LOCAL_DB_PATH ?? 'file:./src/db/local.db',
         },
-      }),
-});
+      }
+);
 
 /// drizzle.config.ts
 /// import { defineConfig } from 'drizzle-kit';
